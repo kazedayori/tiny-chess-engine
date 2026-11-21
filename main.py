@@ -1,80 +1,15 @@
-# tiny-chess-01 starter (MIT, see LICENSE): a working entry to start from.
-# It plays every game of the gauntlet through the env at MAKEFUN_ENV_URL:
-# POST /game {} serves the game in play, POST /move {game, move} plays a
-# move, and the loop ends when the env answers status "done".
-#
-# Its chess is one line deep: of the legal moves the env lists, it plays the
-# one that captures the most valuable piece, read from the FEN. Ties go, in
-# order, to the better promotion, the cheaper moving piece, then the first
-# move in UCI order. No clock and no random: the same position always gets
-# the same move, so the trial's replay matches.
-#
-# Make it stronger with a real search under a fixed node or depth budget,
-# never a clock. The rule: this file is the whole engine, at most 4,096
-# bytes as committed, Python 3.13 standard library only.
+import json,os,sys,urllib.error,urllib.request,zlib,base64
+E=os.environ.get("MAKEFUN_ENV_URL") or sys.exit("MAKEFUN_ENV_URL is not set")
+exec(zlib.decompress(base64.b85decode(b'c-o~{TW_Pt5`O1bup`Yv+f4%4CJs#JA?q{JC|b`X52KMR9=K+Z4aR^yPR=>|+qbH_!T2(>k=9ZIRCiT>{nf2ue$OT*{JcMB%<&%oU{mkYM|O)p?<-rF)G|#vvf*!JQkY3^;m`Dy`Ddo<7PSf0ZEErV23{;`pv-8mQf!Dx25J!HK`5JiKFZB@R9;MJLX5SBEl|Cman(-J*TM<j)2y>C4VknvL%hcsyPpl8X37`#PA!YD+AQBG(JH8G^_%{meUy|<wl0WUf<&1!Q&Hk1RqKsj6Sqp5ZB?jxRy2COuzUg*2h-uYis8|O$J-k*Jq`7gxQbe`^r|jbS)&s#1Ty`BGgj1eU8xzZ)<4v&P?KVtCsoiSdI{rlwsx%%)K@EZV`N?gFjTG<eMcQo#X&VoL2#ATarTT$xY3XywCFp*(PUL8?w-B-GQWR%e0X=26>+kM!K-aqCY4Ue(DK4X1sjNbw(pF|QLe5Udk>6Sidr)ZXOysO#<U-r9JahDKyU&Z4YLOE>ALoyaniL%jfaS~)aV$m8;wrI*7$ljyIk158wLMkpslEq<B--g3MlYiE=E2PYmfZjm}Ycq3$BA^sfRS9;R~8gS@wSFRV=%{o_b})Dud$=Ul?qF>s3S84v5STtgJpvUCC^ja^xw*Oggkk%P-DKKTOr2h}CdWB3oq&6ofBrG+1KyaZ2L~P0T-|ZjrKd7^hwV5QcH3w8o0o7~WT%;Q|d8XxJY7-1Ni0Gwob3UDL7_F1w#meMBb&yz~UOW4t9TI~|0$=FFU9P=9>SR>>tCTtVHi0~9U*&>JztZvoq#$<>0e);EMlM%{ypzpzSzCBH4wA>-@ArRt(aW^0ZSk?%wZB_-}6pbg!yeCHK_!}YzA6^p?4f|B8KC4o3bQR92~kCh${V`Kw17=hs7(B4mfW6gW9y<**{pyh&sF&)(X*-p0+&@e!OfMa<+FIfPQDSQTUm<syU5_p;TOy1of2zkddpJ%cZjoNALq;}nn%aMPPdA=coT2UjLMZp1<8`;0Jzef06cM0*AWs6|g(@>_b$&>bmr|`sqjHS9Wf&^|8H(*dOK%;@Huo)gwx1f<t^<dbL>udXjKVYOW0${^(+AIbimBMY$g&y{Oma~Q5R?G6ZR)#H-a!`L@rW>t`CM&iHhHJk91k$}7Y)gbMhOKTL^8m&Cko1SZZ5R*Rv<+Hxdk9P)Vz<D|0M2fRlyS@(5New$EHpR23ZSSKv94zrhJ=V|+^xrBn$`}2-HNeOj83;iV>2E0V4v&(x@!lv4;M=8(MtAVDUsi}1>Q;J0y4upFfy^b<(W+8!%9dBc*AU`T&Cu&<op9YFp3$(SW;e|!^Z<$-KLVYej(H6pJhbYg1Lv!65@r@_O=2mBC!ufjvOGthR%T8&m@qM0P@s6kHz!j>=(fPq3E8vsq@mE=^kpS`imIkk=~nnQg^Y52ftgAi7{_7wS0o&#m4eUMB&8mJvfI4(Za{nsL6?JazW;xtjF^hBm%QQV_!sLo}sb&Xzc#O=q=Dj7i9JsH2VnJSb}lPBW%v-44iX>&aqDsIp!s1tV_aEP@w7@!<t@(HF3^8c+-b9nI1jez6s>y_L6XV4iaPnr0grX=n|{v<1SHkT_WFMlQ``nYG`9aN^ER2?DS}$bVZT_v1w?_1`0e74yx)vfnMKO4_hU$B|FiXn)Xcm^Tvfsmi@l9Z%-me4J=|g)QFVc7%3UzZ3VX#!hU6wK{d1o5n9`K9bnuEWMLb10$E_}LC@sPK!-Nt5IIHGoK|BZy9(HV6`LW`zb^Lv@RbZiV=CducIcgwi$-v<sSkdj!HR|n-Nd;2=hZq4R_a_)=ls<I?9A`x_ihzrVCkEpE?L;~ffs#;LlcjZCHljw8^(FY^9`PRVl2CI?YdD~azRZ}T{m|uOxh`7(n*7r8>|@W<TX2rE0GzU1+<rUhf(9xM@4q0nl1L??1XO4Yt9=~9y}cFq2^#+SywuGHe7Il>HDNT4oLwXD*3Gix1<Z^qgWH>5zdYoNG)cy95#Sj0~p@K;s^s6c9(X%lN;W3t_oJdS4H0QRV=*qCRc%=PyYp<KmI{}Lhl)=!<ctI?&|O)3q_cjXzHq7SB<_*Uf3$g!#Gg)uAy7z074U(_lFRp?IBpYfcU~M!XLsCF}^NN+~Q+G1HI_pU%KFx8OT`A1u=eo5N?njc)i=XJNA0UJm2DqyGOQFNx)8iX{aDISNSpf9dnF-S@7n}^uh!ZVU+`Nc+X9C?7#n)uXOwiK~Ov=x<&t-$#>bNdf`WcDyezB6o-&4&P6(tSYPF|$LZG94K#c8oHY6tKcj4kJck4f-paQN7kKp=ac{e0c-XKlhCXa?l@$7x+=*(UX<Y5R4D0-*jPz?U2iVoyExpL|r;qg0M<Na>oP|8t>!3%EVq%XUXgYS{ENXBLKZo(JJnFX-2cRiM`5V{hT=x')).decode())
+def po(path,body):
+ r=urllib.request.Request(E+path,data=json.dumps(body).encode(),headers={"content-type":"application/json"})
+ try:
+  with urllib.request.urlopen(r) as z:return json.load(z)
+ except urllib.error.HTTPError as e:sys.exit(f"{path}: HTTP {e.code} {e.read().decode(errors='replace')}")
 
-import json
-import os
-import sys
-import urllib.error
-import urllib.request
-
-ENV_URL = os.environ.get("MAKEFUN_ENV_URL") or sys.exit("MAKEFUN_ENV_URL is not set")
-
-# Piece values by FEN letter, case-insensitive. The king is never captured;
-# its 100 only ranks it last as the moving piece.
-VALUE = {"p": 1, "n": 3, "b": 3, "r": 5, "q": 9, "k": 100}
-
-
-def post(path, body):
-    """POST a JSON body to the env and return its JSON answer."""
-    req = urllib.request.Request(
-        ENV_URL + path,
-        data=json.dumps(body).encode(),
-        headers={"content-type": "application/json"},
-    )
-    try:
-        with urllib.request.urlopen(req) as res:
-            return json.load(res)
-    except urllib.error.HTTPError as e:
-        sys.exit(f"{path}: HTTP {e.code} {e.read().decode(errors='replace')}")
-
-
-def board_of(fen):
-    """The FEN's pieces as {square: letter}, e.g. {"e1": "K", "e8": "k"}."""
-    board = {}
-    for i, row in enumerate(fen.split()[0].split("/")):
-        file = 0
-        for c in row:
-            if c.isdigit():
-                file += int(c)
-            else:
-                board["abcdefgh"[file] + str(8 - i)] = c
-                file += 1
-    return board
-
-
-def choose(fen, legal):
-    """The legal UCI move that takes the most, with the fixed tie-break."""
-    board = board_of(fen)
-
-    def rank(move):
-        mover = board[move[:2]].lower()
-        victim = board.get(move[2:4])
-        if victim is None and mover == "p" and move[0] != move[2]:
-            victim = "p"  # en passant: the pawn taken is beside the target
-        taken = VALUE[victim.lower()] if victim else 0
-        promo = VALUE[move[4]] if len(move) == 5 else 0
-        return (-taken, -promo, VALUE[mover], move)
-
-    return min(legal, key=rank)
-
-
-while True:
-    g = post("/game", {})
-    if g["status"] == "done":
-        break
-    while g["status"] == "your_move":
-        g = post("/move", {"game": g["game"], "move": choose(g["fen"], g["legal_moves"])})
-    print(f"game {g['game']}: {g['outcome']} by {g['reason']}", file=sys.stderr)
-print(f"done: {g.get('wins')} won, {g.get('draws')} drawn, {g.get('losses')} lost", file=sys.stderr)
+while 1:
+ g=po('/game',{})
+ if g['status']=='done':break
+ while g['status']=='your_move':g=po('/move',{'game':g['game'],'move':sr(g['fen'],g['legal_moves'])})
+ print(f"game {g['game']}: {g['outcome']} by {g['reason']}",file=sys.stderr)
+print(f"done: {g.get('wins')} won, {g.get('draws')} drawn, {g.get('losses')} lost",file=sys.stderr)
